@@ -1,1 +1,485 @@
-ここはアースのホームページ
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一般社団法人EARTH プロジェクト概要</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .header h1 {
+        font-size: 2.5rem;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+    
+    .header p {
+        font-size: 1.1rem;
+        color: #666;
+    }
+    
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card h2 {
+        color: #667eea;
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 8px;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, #667eea, #764ba2);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+        padding-left: 25px;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -8px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #667eea;
+        border: 2px solid white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .timeline-item.urgent::before {
+        background: #ff6b6b;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    
+    .timeline-date {
+        font-weight: bold;
+        color: #667eea;
+        font-size: 0.9rem;
+    }
+    
+    .timeline-content {
+        margin-top: 5px;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin: 5px 5px 5px 0;
+    }
+    
+    .team-member {
+        background: #f8f9ff;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .team-member h4 {
+        color: #667eea;
+        margin-bottom: 5px;
+    }
+    
+    .project-overview {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .project-overview h2 {
+        color: white;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 20px;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .feature-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        backdrop-filter: blur(5px);
+    }
+    
+    .feature-item h4 {
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+    }
+    
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    
+    .status-planning { background: #ffd93d; }
+    .status-progress { background: #6bcf7f; }
+    .status-urgent { background: #ff6b6b; }
+    
+    .action-items {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .action-items h3 {
+        color: #856404;
+        margin-bottom: 15px;
+    }
+    
+    .action-item {
+        background: white;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 4px solid #ffd93d;
+    }
+    
+    .location-info {
+        background: #e8f5e8;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+    
+    .location-info h4 {
+        color: #2d5a2d;
+        margin-bottom: 8px;
+    }
+    
+    @media (max-width: 768px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+        }
+        
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>一般社団法人EARTH</h1>
+            <p>姫路を拠点とした地域コミュニティ創造プロジェクト</p>
+        </div>
+
+```
+    <div class="project-overview">
+        <h2>🌍 LIFE COMMONS プロジェクト概要</h2>
+        <p>築50年のアパート2棟を改築し、子供から大人まで、アーティストから地域住民まで、あらゆる人が集まる複合コミュニティ施設を創造します。</p>
+        
+        <div class="location-info">
+            <h4>📍 主要拠点</h4>
+            <p><strong>姫路市花田町上原田</strong> - 運営拠点</p>
+            <p><strong>姫路市飾東町庄711</strong> - LIFE COMMONS建設予定地</p>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-item">
+                <h4>🎨 アーティスト<br>イン・レジデンス</h4>
+                <p>創作活動支援</p>
+            </div>
+            <div class="feature-item">
+                <h4>☕ カフェ</h4>
+                <p>地域交流の場</p>
+            </div>
+            <div class="feature-item">
+                <h4>🍳 シェアキッチン</h4>
+                <p>共同利用施設</p>
+            </div>
+            <div class="feature-item">
+                <h4>💆 ケアサロン</h4>
+                <p>健康・癒しの提供</p>
+            </div>
+            <div class="feature-item">
+                <h4>🧒 子どもスペース</h4>
+                <p>子育て支援</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid">
+        <div class="card">
+            <h2>🗓️ 重要タイムライン</h2>
+            <div class="timeline">
+                <div class="timeline-item urgent">
+                    <div class="timeline-date">2025年7月7日</div>
+                    <div class="timeline-content">
+                        <strong>一般社団法人EARTH 設立</strong>
+                        <br>法人登記完了予定
+                    </div>
+                </div>
+                <div class="timeline-item urgent">
+                    <div class="timeline-date">2025年7月10日</div>
+                    <div class="timeline-content">
+                        <strong>新事業進出補助金 申請締切</strong>
+                        <br>独立行政法人中小企業基盤整備機構
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年8月〜</div>
+                    <div class="timeline-content">
+                        補助金審査期間
+                        <br>並行してプロジェクト詳細設計
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年秋〜</div>
+                    <div class="timeline-content">
+                        LIFE COMMONS 改築工事開始予定
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>👤 大塚海平さんの役割</h2>
+            <div class="role-badge">社員</div>
+            <div class="role-badge">プロジェクト推進</div>
+            <div class="role-badge">企画・運営</div>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px; color: #667eea;">主な責任領域</h3>
+            <ul style="padding-left: 20px;">
+                <li>LIFE COMMONSプロジェクトの企画・運営支援</li>
+                <li>補助金申請プロセスの管理・調整</li>
+                <li>各専門家チームとの連携・調整</li>
+                <li>プロジェクト進行状況の見える化</li>
+                <li>地域コミュニティとの関係構築</li>
+                <li>施設運営計画の策定支援</li>
+            </ul>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px; color: #667eea;">株式会社SPACEとの連携</h3>
+            <p>既存事業の知見を活かし、新しいコミュニティ創造事業を展開</p>
+        </div>
+        
+        <div class="card">
+            <h2>👥 プロジェクトチーム</h2>
+            
+            <div class="team-member">
+                <h4>福本理恵</h4>
+                <p><strong>代表理事</strong></p>
+                <p>株式会社SPACE代表、プロジェクト統括責任者</p>
+            </div>
+            
+            <div class="team-member">
+                <h4>大塚海平</h4>
+                <p><strong>社員</strong></p>
+                <p>プロジェクト推進、企画・運営、チーム調整</p>
+            </div>
+            
+            <div class="team-member">
+                <h4>理事 2名</h4>
+                <p><strong>理事</strong></p>
+                <p>組織運営・意思決定支援</p>
+            </div>
+            
+            <div class="team-member">
+                <h4>専門家チーム</h4>
+                <p><strong>中小企業診断士</strong> - 補助金申請・事業計画策定</p>
+                <p><strong>建築士</strong> - 施設設計・改築計画</p>
+                <p><strong>士業関係者</strong> - 法人設立・法務サポート</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>📋 現在の進行状況</h2>
+            
+            <div style="margin-bottom: 15px;">
+                <span class="status-indicator status-progress"></span>
+                <strong>法人設立準備</strong> - 進行中
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <span class="status-indicator status-urgent"></span>
+                <strong>補助金申請準備</strong> - 締切間近
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <span class="status-indicator status-planning"></span>
+                <strong>施設設計</strong> - 企画段階
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <span class="status-indicator status-planning"></span>
+                <strong>地域連携</strong> - 構想段階
+            </div>
+            
+            <div class="action-items">
+                <h3>🎯 緊急アクションアイテム</h3>
+                <div class="action-item">
+                    <strong>7月10日まで</strong>: 新事業進出補助金申請書類の完成・提出
+                </div>
+                <div class="action-item">
+                    <strong>7月7日まで</strong>: 一般社団法人設立手続きの完了
+                </div>
+                <div class="action-item">
+                    <strong>継続中</strong>: 建築士との施設改築プラン詳細化
+                </div>
+                <div class="action-item">
+                    <strong>継続中</strong>: 中小企業診断士との事業計画ブラッシュアップ
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🏗️ 施設概要</h2>
+            <h3 style="color: #667eea; margin-bottom: 10px;">改築対象</h3>
+            <p><strong>築50年アパート2棟</strong></p>
+            <p>所在地: 姫路市飾東町庄711</p>
+            <p>所有者: 福本理恵氏の父</p>
+            
+            <h3 style="color: #667eea; margin: 20px 0 10px 0;">改築後の機能</h3>
+            <ul style="padding-left: 20px;">
+                <li>多世代交流スペース</li>
+                <li>アーティスト創作・滞在施設</li>
+                <li>地域住民の憩いの場</li>
+                <li>子育て支援拠点</li>
+                <li>健康・ウェルネス拠点</li>
+                <li>食文化・交流拠点</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>💡 プロジェクトの意義</h2>
+            <p><strong>地域再生</strong></p>
+            <p>高齢化・過疎化が進む地域に新たな活力を注入し、持続可能なコミュニティを創造します。</p>
+            
+            <p style="margin-top: 15px;"><strong>多世代交流</strong></p>
+            <p>子どもから高齢者まで、様々な世代が自然に交流できる場を提供します。</p>
+            
+            <p style="margin-top: 15px;"><strong>文化創造</strong></p>
+            <p>アーティストと地域住民の交流を通じて、新しい地域文化を創造します。</p>
+            
+            <p style="margin-top: 15px;"><strong>持続可能性</strong></p>
+            <p>既存建物の有効活用により、環境負荷を抑えた地域開発を実現します。</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 現在の日付を取得して、緊急度を動的に表示
+    const today = new Date();
+    const deadline = new Date('2025-07-10');
+    const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntilDeadline <= 7) {
+        document.querySelectorAll('.timeline-item.urgent').forEach(item => {
+            item.style.backgroundColor = '#fff5f5';
+            item.style.borderRadius = '8px';
+            item.style.padding = '10px';
+            item.style.marginBottom = '15px';
+        });
+    }
+    
+    // スムーズスクロール効果
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+</script>
+```
+
+</body>
+</html>
