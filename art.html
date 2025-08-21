@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ノイズアート - タッチで描く</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        color: white;
+        overflow: hidden;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 1.8em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+        text-align: center;
+        margin-bottom: 15px;
+        opacity: 0.9;
+        font-size: 0.85em;
+    }
+
+    canvas {
+        width: 100%;
+        height: 350px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        margin-bottom: 15px;
+        cursor: crosshair;
+        touch-action: none;
+    }
+
+    .noise-simulator {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .noise-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+
+    .noise-btn:active, .noise-btn.active {
+        background: rgba(255, 255, 255, 0.4);
+        transform: scale(0.95);
+    }
+
+    .info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        text-align: center;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+
+    .info-item {
+        padding: 5px;
+    }
+
+    .info-label {
+        font-size: 0.75em;
+        opacity: 0.8;
+        margin-bottom: 3px;
+    }
+
+    .info-value {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .mode-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .mode-btn {
+        padding: 10px;
+        font-size: 13px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .mode-btn.active {
+        background: rgba(255, 255, 255, 0.4);
+        border-color: white;
+    }
+
+    .controls {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+
+    button:active {
+        transform: scale(0.95);
+    }
+
+    .slider-container {
+        margin: 15px 0;
+    }
+
+    .slider-label {
+        margin-bottom: 5px;
+        font-size: 0.85em;
+        text-align: center;
+    }
+
+    input[type="range"] {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+        outline: none;
+        -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .auto-mode {
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .toggle-switch {
+        display: inline-block;
+        width: 50px;
+        height: 26px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 13px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.3s;
+        vertical-align: middle;
+        margin-left: 10px;
+    }
+
+    .toggle-switch.active {
+        background: rgba(100, 255, 100, 0.5);
+    }
+
+    .toggle-switch::after {
+        content: '';
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        background: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.3s;
+    }
+
+    .toggle-switch.active::after {
+        transform: translateX(24px);
+    }
+
+    @media (max-width: 480px) {
+        h1 { font-size: 1.5em; }
+        canvas { height: 300px; }
+        .mode-selector { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 ノイズアート</h1>
+        <p class="subtitle">タッチや動きでノイズを作って絵を描こう</p>
+
+```
+    <canvas id="canvas"></canvas>
+
+    <div class="noise-simulator">
+        <span style="font-size: 0.85em;">ノイズ生成:</span>
+        <button class="noise-btn" data-noise="quiet">静寂</button>
+        <button class="noise-btn" data-noise="crowd">ざわめき</button>
+        <button class="noise-btn" data-noise="traffic">交通音</button>
+        <button class="noise-btn" data-noise="music">音楽</button>
+    </div>
+
+    <div class="info">
+        <div class="info-item">
+            <div class="info-label">仮想音量</div>
+            <div class="info-value" id="volume">0</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">周波数</div>
+            <div class="info-value" id="frequency">0</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">パーティクル</div>
+            <div class="info-value" id="particle-count">0</div>
+        </div>
+    </div>
+
+    <div class="mode-selector">
+        <button class="mode-btn active" data-mode="particles">✨ パーティクル</button>
+        <button class="mode-btn" data-mode="waves">〰️ 波形</button>
+        <button class="mode-btn" data-mode="spiral">🌀 スパイラル</button>
+        <button class="mode-btn" data-mode="tree">🌳 ツリー</button>
+    </div>
+
+    <div class="auto-mode">
+        <span>自動生成モード</span>
+        <div class="toggle-switch" id="auto-toggle"></div>
+    </div>
+
+    <div class="slider-container">
+        <div class="slider-label">感度: <span id="sensitivity-value">5</span></div>
+        <input type="range" id="sensitivity" min="1" max="10" value="5">
+    </div>
+
+    <div class="controls">
+        <button id="clearBtn">🗑️ クリア</button>
+        <button id="saveBtn">💾 保存</button>
+        <button id="randomBtn">🎲 ランダム</button>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const volumeDisplay = document.getElementById('volume');
+    const frequencyDisplay = document.getElementById('frequency');
+    const particleCountDisplay = document.getElementById('particle-count');
+    const sensitivitySlider = document.getElementById('sensitivity');
+    const sensitivityValue = document.getElementById('sensitivity-value');
+    const autoToggle = document.getElementById('auto-toggle');
+    const clearBtn = document.getElementById('clearBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const randomBtn = document.getElementById('randomBtn');
+
+    let currentMode = 'particles';
+    let sensitivity = 5;
+    let autoMode = false;
+    let virtualVolume = 0;
+    let virtualFrequency = 0;
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let currentNoiseType = 'quiet';
+
+    // Canvas setup
+    function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * 2;
+        canvas.height = rect.height * 2;
+        ctx.scale(2, 2);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Particle system
+    const particles = [];
+    const maxParticles = 150;
+
+    class Particle {
+        constructor(x, y, size, color, velocity) {
+            this.x = x;
+            this.y = y;
+            this.size = size;
+            this.color = color;
+            this.velocity = velocity;
+            this.life = 1.0;
+            this.decay = 0.008;
+            this.rotation = Math.random() * Math.PI * 2;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+        }
+
+        update() {
+            this.x += this.velocity.x;
+            this.y += this.velocity.y;
+            this.velocity.x *= 0.99;
+            this.velocity.y *= 0.99;
+            this.life -= this.decay;
+            this.size *= 0.995;
+            this.rotation += this.rotationSpeed;
+        }
+
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = this.life * 0.8;
+            ctx.fillStyle = this.color;
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.beginPath();
+            ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    // Noise patterns
+    const noisePatterns = {
+        quiet: { volumeRange: [0, 20], freqRange: [100, 500], chaos: 0.1 },
+        crowd: { volumeRange: [30, 70], freqRange: [200, 2000], chaos: 0.5 },
+        traffic: { volumeRange: [40, 80], freqRange: [50, 800], chaos: 0.7 },
+        music: { volumeRange: [20, 90], freqRange: [100, 8000], chaos: 0.3 }
+    };
+
+    function getColorFromFrequency(frequency) {
+        const hue = (frequency / 10000) * 360;
+        const saturation = 60 + (virtualVolume / 100) * 40;
+        return `hsl(${hue}, ${saturation}%, 50%)`;
+    }
+
+    function simulateNoise(x, y, velocity) {
+        const pattern = noisePatterns[currentNoiseType];
+        const distance = Math.sqrt(velocity.x ** 2 + velocity.y ** 2);
+        
+        virtualVolume = pattern.volumeRange[0] + 
+            Math.random() * (pattern.volumeRange[1] - pattern.volumeRange[0]) +
+            distance * sensitivity;
+        virtualVolume = Math.min(100, virtualVolume);
+        
+        virtualFrequency = pattern.freqRange[0] + 
+            Math.random() * (pattern.freqRange[1] - pattern.freqRange[0]);
+        
+        volumeDisplay.textContent = Math.round(virtualVolume);
+        frequencyDisplay.textContent = Math.round(virtualFrequency);
+    }
+
+    function createParticles(x, y, count = 1) {
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = (virtualVolume / 100) * sensitivity * 0.5;
+            const size = Math.max(1, (virtualVolume / 100) * 8);
+            const color = getColorFromFrequency(virtualFrequency);
+            
+            particles.push(new Particle(
+                x,
+                y,
+                size,
+                color,
+                {
+                    x: Math.cos(angle) * speed + (Math.random() - 0.5) * 2,
+                    y: Math.sin(angle) * speed + (Math.random() - 0.5) * 2
+                }
+            ));
+        }
+        
+        if (particles.length > maxParticles) {
+            particles.splice(0, particles.length - maxParticles);
+        }
+        
+        particleCountDisplay.textContent = particles.length;
+    }
+
+    let waveOffset = 0;
+    function drawWaves(x, y) {
+        const amplitude = (virtualVolume / 100) * 30 * (sensitivity / 5);
+        const frequency = virtualFrequency / 1000;
+        const color = getColorFromFrequency(virtualFrequency);
+        
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        
+        for (let i = 0; i < canvas.width / 2; i += 5) {
+            const yPos = y + Math.sin((i + waveOffset) * frequency) * amplitude;
+            if (i === 0) {
+                ctx.moveTo(i, yPos);
+            } else {
+                ctx.lineTo(i, yPos);
+            }
+        }
+        ctx.stroke();
+        waveOffset += 5;
+    }
+
+    let spiralAngle = 0;
+    let spiralRadius = 0;
+    function drawSpiral(centerX, centerY) {
+        spiralRadius += (virtualVolume / 100) * 2 * (sensitivity / 5);
+        spiralAngle += 0.2;
+        
+        const x = centerX + Math.cos(spiralAngle) * spiralRadius;
+        const y = centerY + Math.sin(spiralAngle) * spiralRadius;
+        
+        const color = getColorFromFrequency(virtualFrequency);
+        const size = Math.max(1, (virtualVolume / 100) * 5);
+        
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        if (spiralRadius > Math.max(canvas.width, canvas.height) / 4) {
+            spiralRadius = 0;
+        }
+    }
+
+    const branches = [];
+    function drawTree(x, y) {
+        if (virtualVolume > 30 && Math.random() < 0.3) {
+            const angle = (Math.random() - 0.5) * Math.PI;
+            const length = (virtualVolume / 100) * 40 * (sensitivity / 5);
+            const color = getColorFromFrequency(virtualFrequency);
+            
+            branches.push({
+                x: x,
+                y: y,
+                angle: angle - Math.PI / 2,
+                length: length,
+                color: color,
+                life: 1.0,
+                thickness: 3
+            });
+        }
+        
+        ctx.save();
+        branches.forEach((branch, index) => {
+            ctx.strokeStyle = branch.color;
+            ctx.globalAlpha = branch.life;
+            ctx.lineWidth = branch.thickness * branch.life;
+            ctx.beginPath();
+            ctx.moveTo(branch.x, branch.y);
+            const endX = branch.x + Math.cos(branch.angle) * branch.length;
+            const endY = branch.y + Math.sin(branch.angle) * branch.length;
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+            
+            branch.life -= 0.005;
+            if (branch.life <= 0) {
+                branches.splice(index, 1);
+            }
+        });
+        ctx.restore();
+    }
+
+    function animate() {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+        ctx.fillRect(0, 0, canvas.width / 2, canvas.height / 2);
+        
+        particles.forEach((particle, index) => {
+            particle.update();
+            particle.draw();
+            
+            if (particle.life <= 0) {
+                particles.splice(index, 1);
+            }
+        });
+        
+        particleCountDisplay.textContent = particles.length;
+        
+        if (autoMode) {
+            const centerX = canvas.width / 4;
+            const centerY = canvas.height / 4;
+            const time = Date.now() * 0.001;
+            
+            const autoX = centerX + Math.sin(time) * 100;
+            const autoY = centerY + Math.cos(time * 0.7) * 100;
+            
+            simulateNoise(autoX, autoY, { x: Math.sin(time) * 5, y: Math.cos(time) * 5 });
+            
+            switch(currentMode) {
+                case 'particles':
+                    if (Math.random() < 0.3) createParticles(autoX, autoY, 1);
+                    break;
+                case 'waves':
+                    drawWaves(autoX, autoY);
+                    break;
+                case 'spiral':
+                    drawSpiral(centerX, centerY);
+                    break;
+                case 'tree':
+                    drawTree(autoX, autoY);
+                    break;
+            }
+        }
+        
+        requestAnimationFrame(animate);
+    }
+
+    // Touch and mouse handlers
+    function getPosition(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+        return { x, y };
+    }
+
+    function startDrawing(e) {
+        e.preventDefault();
+        isDrawing = true;
+        const pos = getPosition(e);
+        lastX = pos.x;
+        lastY = pos.y;
+    }
+
+    function draw(e) {
+        e.preventDefault();
+        if (!isDrawing) return;
+        
+        const pos = getPosition(e);
+        const velocity = {
+            x: pos.x - lastX,
+            y: pos.y - lastY
+        };
+        
+        simulateNoise(pos.x, pos.y, velocity);
+        
+        switch(currentMode) {
+            case 'particles':
+                createParticles(pos.x, pos.y, Math.ceil(virtualVolume / 30));
+                break;
+            case 'waves':
+                drawWaves(pos.x, pos.y);
+                break;
+            case 'spiral':
+                drawSpiral(pos.x, pos.y);
+                break;
+            case 'tree':
+                drawTree(pos.x, pos.y);
+                break;
+        }
+        
+        lastX = pos.x;
+        lastY = pos.y;
+    }
+
+    function stopDrawing(e) {
+        e.preventDefault();
+        isDrawing = false;
+        virtualVolume = 0;
+        volumeDisplay.textContent = '0';
+    }
+
+    // Event listeners
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+    
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', stopDrawing);
+
+    // Mode selection
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMode = btn.dataset.mode;
+            spiralRadius = 0;
+            spiralAngle = 0;
+        });
+    });
+
+    // Noise type selection
+    document.querySelectorAll('.noise-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.noise-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentNoiseType = btn.dataset.noise;
+        });
+    });
+
+    // Auto mode toggle
+    autoToggle.addEventListener('click', () => {
+        autoMode = !autoMode;
+        autoToggle.classList.toggle('active');
+    });
+
+    // Sensitivity control
+    sensitivitySlider.addEventListener('input', (e) => {
+        sensitivity = parseInt(e.target.value);
+        sensitivityValue.textContent = sensitivity;
+    });
+
+    // Control buttons
+    clearBtn.addEventListener('click', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width / 2, canvas.height / 2);
+        particles.length = 0;
+        branches.length = 0;
+        spiralAngle = 0;
+        spiralRadius = 0;
+        waveOffset = 0;
+        particleCountDisplay.textContent = '0';
+    });
+
+    saveBtn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = `noise-art-${Date.now()}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+
+    randomBtn.addEventListener('click', () => {
+        const modes = ['particles', 'waves', 'spiral', 'tree'];
+        const noises = ['quiet', 'crowd', 'traffic', 'music'];
+        
+        currentMode = modes[Math.floor(Math.random() * modes.length)];
+        currentNoiseType = noises[Math.floor(Math.random() * noises.length)];
+        
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.mode-btn[data-mode="${currentMode}"]`).classList.add('active');
+        
+        document.querySelectorAll('.noise-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.noise-btn[data-noise="${currentNoiseType}"]`).classList.add('active');
+        
+        sensitivity = Math.floor(Math.random() * 10) + 1;
+        sensitivitySlider.value = sensitivity;
+        sensitivityValue.textContent = sensitivity;
+    });
+
+    // Start animation loop
+    animate();
+
+    // Initialize with white background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width / 2, canvas.height / 2);
+</script>
+```
+
+</body>
+</html>
