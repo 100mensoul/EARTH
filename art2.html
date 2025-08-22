@@ -3,75 +3,41 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ノイズアート - 音で描く（統合版）</title>
+  <title>ノイズアート - 音で描く（統合・ピーク改善版）</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
-    :root{
-      --bg1:#667eea; --bg2:#764ba2; --glass:rgba(255,255,255,.10);
-      --glass-strong:rgba(255,255,255,.18); --ink:#fff; --shadow:0 8px 32px rgba(0,0,0,.15);
-      --radius-lg:20px; --radius-md:12px; --radius-sm:8px;
-    }
+    :root{ --bg1:#667eea; --bg2:#764ba2; --glass:rgba(255,255,255,.10); --glass-strong:rgba(255,255,255,.18); --ink:#fff; --shadow:0 8px 32px rgba(0,0,0,.15); --radius-lg:20px; --radius-md:12px; --radius-sm:8px; }
     html,body{height:100%;}
-    body{
-      margin:0; font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-      color:var(--ink);
-      background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);
-      display:grid; place-items:center; padding:20px;
-    }
-    .container{
-      width:min(100%,960px); background:var(--glass); backdrop-filter:blur(12px);
-      border-radius:var(--radius-lg); padding:28px; box-shadow:var(--shadow);
-    }
+    body{ margin:0; font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; color:var(--ink);
+      background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%); display:grid; place-items:center; padding:20px; }
+    .container{ width:min(100%,960px); background:var(--glass); backdrop-filter:blur(12px); border-radius:var(--radius-lg); padding:28px; box-shadow:var(--shadow); }
     h1{margin:0 0 8px; text-align:center; font-size:clamp(24px,3.2vw,36px); font-weight:800; text-shadow:2px 2px 6px rgba(0,0,0,.3);}
     .subtitle{text-align:center; margin:0 0 20px; opacity:.9; font-size:.95rem;}
-    .notice{
-      text-align:center; padding:14px 16px; background:rgba(255,200,0,.2);
-      border:1px solid rgba(255,200,0,.35); border-radius:var(--radius-md); margin-bottom:16px;
-    }
-    canvas{
-      width:100%; height:400px; background:rgba(255,255,255,.95); border-radius:16px;
-      box-shadow:0 4px 15px rgba(0,0,0,.2); margin-bottom:16px; cursor:crosshair; touch-action:none;
-    }
-    .info{
-      display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; padding:12px;
-      background:rgba(0,0,0,.2); border-radius:12px; margin-bottom:16px;
-    }
-    .info-label{font-size:.85em; opacity:.85; margin-bottom:4px;}
-    .info-value{font-size:1.4em; font-weight:800;}
+    .notice{ text-align:center; padding:14px 16px; background:rgba(255,200,0,.2); border:1px solid rgba(255,200,0,.35); border-radius:var(--radius-md); margin-bottom:16px; }
+    canvas{ width:100%; height:400px; background:rgba(255,255,255,.95); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,.2); margin-bottom:16px; cursor:crosshair; touch-action:none; }
+    .info{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; padding:12px; background:rgba(0,0,0,.2); border-radius:12px; margin-bottom:16px; }
+    .info-label{font-size:.85em; opacity:.85; margin-bottom:4px;} .info-value{font-size:1.4em; font-weight:800;}
     .toolbar{margin-bottom:12px;}
     .mode-selector{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;}
-    .mode-btn{
-      background:rgba(255,255,255,.2); color:#fff; border:2px solid rgba(255,255,255,.3);
-      padding:8px 16px; border-radius:999px; font-size:14px; cursor:pointer; backdrop-filter:blur(5px);
-      transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
-    }
-    .mode-btn:hover{background:rgba(255,255,255,.3); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.2);}
-    .mode-btn.active{background:rgba(255,255,255,.4); border-color:#fff;}
+    .mode-btn{ background:rgba(255,255,255,.2); color:#fff; border:2px solid rgba(255,255,255,.3); padding:8px 16px; border-radius:999px; font-size:14px; cursor:pointer; backdrop-filter:blur(5px);
+      transition:transform .2s ease, background .2s ease, box-shadow .2s ease; }
+    .mode-btn:hover{background:rgba(255,255,255,.3); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.2);} .mode-btn.active{background:rgba(255,255,255,.4); border-color:#fff;}
     .control-grid{display:grid; grid-template-columns:repeat(6,minmax(120px,1fr)); gap:10px;}
     @media (max-width:900px){.control-grid{grid-template-columns:repeat(3,minmax(120px,1fr));}}
     @media (max-width:520px){.control-grid{grid-template-columns:repeat(2,minmax(120px,1fr));}}
-    .control{display:grid; gap:6px;}
-    .slider-label{font-size:.9em; opacity:.9;}
+    .control{display:grid; gap:6px;} .slider-label{font-size:.9em; opacity:.9;}
     input[type="range"]{width:100%; height:6px; background:rgba(255,255,255,.3); border-radius:3px; outline:none; -webkit-appearance:none;}
     input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; height:20px; background:#fff; border-radius:50%; cursor:pointer;}
     input[type="range"]::-moz-range-thumb{width:20px; height:20px; background:#fff; border:none; border-radius:50%; cursor:pointer;}
     select,button,input[type="checkbox"]{font:inherit;}
-    select{
-      width:100%; padding:10px 12px; border-radius:8px; border:2px solid rgba(255,255,255,.3);
-      background:rgba(255,255,255,.2); color:#fff;
-    }
+    select{ width:100%; padding:10px 12px; border-radius:8px; border:2px solid rgba(255,255,255,.3); background:rgba(255,255,255,.2); color:#fff; }
     .checkbox{align-items:center; grid-auto-flow:column; grid-auto-columns:max-content; gap:8px;}
     .controls{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px;}
-    button{
-      background:rgba(255,255,255,.2); color:#fff; border:2px solid rgba(255,255,255,.3);
-      padding:12px 20px; border-radius:25px; font-size:16px; cursor:pointer; backdrop-filter:blur(5px);
-      transition:all .2s ease;
-    }
-    button:hover{background:rgba(255,255,255,.3); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.2);}
-    button.primary{border-color:#fff; background:var(--glass-strong);}
+    button{ background:rgba(255,255,255,.2); color:#fff; border:2px solid rgba(255,255,255,.3); padding:12px 20px; border-radius:25px; font-size:16px; cursor:pointer; backdrop-filter:blur(5px); transition:all .2s ease; }
+    button:hover{background:rgba(255,255,255,.3); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.2);} button.primary{border-color:#fff; background:var(--glass-strong);}
     .footnote{margin-top:14px; color:rgba(255,255,255,.9); text-align:center; font-size:.85rem;}
   </style>
 </head>
@@ -80,25 +46,14 @@
     <h1>🎨 ノイズアート</h1>
     <p class="subtitle">周囲の音を美しいアートに変換します</p>
 
-    <div id="permission-message" class="notice">
-      「録音開始」ボタンを押してマイクの使用を許可してください
-    </div>
+    <div id="permission-message" class="notice">「録音開始」ボタンを押してマイクの使用を許可してください</div>
 
     <canvas id="canvas" aria-label="音で描くキャンバス"></canvas>
 
     <section class="info" aria-live="polite">
-      <div class="info-item">
-        <div class="info-label">音量レベル</div>
-        <div class="info-value" id="volume">0</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">周波数ピーク</div>
-        <div class="info-value" id="frequency">0 Hz</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">ノイズタイプ</div>
-        <div class="info-value" id="noise-type">-</div>
-      </div>
+      <div class="info-item"><div class="info-label">音量レベル</div><div class="info-value" id="volume">0</div></div>
+      <div class="info-item"><div class="info-label">周波数ピーク</div><div class="info-value" id="frequency">0 Hz</div></div>
+      <div class="info-item"><div class="info-label">ノイズタイプ</div><div class="info-value" id="noise-type">-</div></div>
     </section>
 
     <section class="toolbar">
@@ -114,39 +69,31 @@
           <span class="slider-label">感度: <b id="sensitivity-value">5</b></span>
           <input type="range" id="sensitivity" min="1" max="10" value="5" />
         </label>
-
         <label class="control">
           <span class="slider-label">トレイル（残像）: <b id="trail-value">0.02</b></span>
           <input type="range" id="trail" min="0" max="0.2" step="0.005" value="0.02" />
         </label>
-
         <label class="control">
           <span class="slider-label">FFTサイズ</span>
           <select id="fftSize">
             <option value="256">256</option>
-            <option value="512" selected>512</option>
+            <option value="512">512</option>
             <option value="1024">1024</option>
-            <option value="2048">2048</option>
+            <option value="2048" selected>2048</option>
           </select>
         </label>
-
         <label class="control">
           <span class="slider-label">スムージング</span>
-          <input type="range" id="smoothing" min="0" max="0.95" step="0.01" value="0.75" />
+          <input type="range" id="smoothing" min="0" max="0.95" step="0.01" value="0.5" />
         </label>
-
         <label class="control">
           <span class="slider-label">マイク</span>
-          <select id="deviceSelect" title="入力デバイス選択">
-            <option value="">（未選択）</option>
-          </select>
+          <select id="deviceSelect" title="入力デバイス選択"><option value="">（未選択）</option></select>
         </label>
-
         <label class="control checkbox">
-          <input type="checkbox" id="rawAudio" />
+          <input type="checkbox" id="rawAudio" checked />
           <span>生音（抑制OFF）</span>
         </label>
-
         <label class="control checkbox">
           <input type="checkbox" id="autoClear" checked />
           <span>モード切替で自動クリア</span>
@@ -162,30 +109,25 @@
   </main>
 
   <footer class="footnote">
-    <small>Tip: タブを離れると自動で一時停止、戻ると再開します。</small>
+    <small>Tip: ピークが立たない時は「生音（抑制OFF）」ON、FFT大きめ、スムージング低めに。</small>
   </footer>
 
-  <!-- 設定JSON（参照用・上書きしたいときはここを書き換え） -->
-  <script id="app-settings" type="application/json">
-  {
-    "defaultMode": "particles",
-    "sensitivity": 5,
-    "trail": 0.02,
-    "fftSize": 512,
-    "smoothingTimeConstant": 0.75,
-    "fpsCap": 60,
-    "maxParticles": 500,
-    "autoClearOnModeChange": true,
-    "rawAudio": false,
-    "canvas": {
-      "background": "#ffffff",
-      "exportScale": 2
-    }
-  }
-  </script>
-
   <script>
-    // ====== DOM参照 ======
+    // ====== 設定 ======
+    const SETTINGS = {
+      defaultMode: 'particles',
+      sensitivity: 5,
+      trail: 0.02,
+      fftSize: 2048,
+      smoothingTimeConstant: 0.5,
+      fpsCap: 60,
+      maxParticles: 500,
+      autoClearOnModeChange: true,
+      rawAudio: true,
+      canvas: { background: '#ffffff', exportScale: 2 }
+    };
+
+    // ====== DOM ======
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d', { alpha: true });
     const startBtn = document.getElementById('startBtn');
@@ -207,70 +149,97 @@
     const rawAudioCheckbox = document.getElementById('rawAudio');
     const autoClearCheckbox = document.getElementById('autoClear');
 
-    // ====== 設定読み込み ======
-    const SETTINGS = (() => {
-      try {
-        return JSON.parse(document.getElementById('app-settings').textContent);
-      } catch { return {}; }
-    })();
-
     // ====== 状態 ======
-    let audioContext = null;
-    let analyser = null;
-    let mediaStream = null;
-    let microphone = null;
-    let isRecording = false;
-    let animationId = null;
-    let currentMode = SETTINGS.defaultMode || 'particles';
-    let sensitivity = SETTINGS.sensitivity ?? 5;
-    let trail = SETTINGS.trail ?? 0.02;
+    let audioContext = null, analyser = null, mediaStream = null, microphone = null;
+    let isRecording = false, animationId = null;
+    let currentMode = SETTINGS.defaultMode;
+    let sensitivity = SETTINGS.sensitivity;
+    let trail = SETTINGS.trail;
     let dpr = Math.max(1, window.devicePixelRatio || 1);
-    let fpsCap = SETTINGS.fpsCap ?? 60;
-    const MAX_PARTICLES = SETTINGS.maxParticles ?? 500;
-    let lastFrame = 0;
+    let fpsCap = SETTINGS.fpsCap, lastFrame = 0;
+    const MAX_PARTICLES = SETTINGS.maxParticles;
 
-    // パーティクル/樹形用
-    const particles = [];
-    let branches = [];
-    let spiralAngle = 0;
+    const particles = []; let branches = []; let spiralAngle = 0;
 
-    // ====== 初期描画領域 ======
-    function resizeCanvas() {
-      const cssWidth = canvas.clientWidth;
-      const cssHeight = canvas.clientHeight;
+    // ====== 画面準備 ======
+    function resizeCanvas(){
+      const w = canvas.clientWidth, h = canvas.clientHeight;
       dpr = Math.max(1, window.devicePixelRatio || 1);
-      canvas.width = Math.round(cssWidth * dpr);
-      canvas.height = Math.round(cssHeight * dpr);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
-
-      // 背景初期化（白）
-      ctx.fillStyle = SETTINGS.canvas?.background || '#ffffff';
-      ctx.fillRect(0, 0, cssWidth, cssHeight);
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr,dpr);
+      ctx.fillStyle = SETTINGS.canvas.background; ctx.fillRect(0,0,w,h);
     }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas, { passive: true });
+    resizeCanvas(); addEventListener('resize', resizeCanvas, { passive:true });
 
-    // ====== ユーティリティ ======
-    function rmsFromTimeDomain(timeData) {
+    // ====== 音量RMS ======
+    function rmsFromTimeDomain(timeData){
       let sumSq = 0;
-      for (let i = 0; i < timeData.length; i++) {
-        const v = (timeData[i] - 128) / 128; // -1..1
-        sumSq += v * v;
-      }
-      return Math.sqrt(sumSq / timeData.length); // 0..1
+      for(let i=0;i<timeData.length;i++){ const v = (timeData[i]-128)/128; sumSq += v*v; }
+      return Math.sqrt(sumSq/timeData.length); // 0..1
     }
 
-    function getPeakFrequency(freqData, sampleRate) {
-      let max = -1, idx = 0;
-      for (let i = 0; i < freqData.length; i++) {
-        if (freqData[i] > max) { max = freqData[i]; idx = i; }
+    // ====== スペクトルピーク（二次補間） ======
+    function peakFreqFromSpectrum(analyser, floatFreqData){
+      // floatFreqData: dBスケール（負の値）
+      // dB → リニアに戻す（相対値でOK）
+      const N = floatFreqData.length;
+      let max = -Infinity, idx = 0;
+      const lin = new Float32Array(N);
+      for (let i=0;i<N;i++){
+        // dBが -Infinity のこともあるので clamp
+        const db = Math.max(-200, floatFreqData[i]);
+        lin[i] = Math.pow(10, db/20); // ≈ 振幅
+        if (lin[i] > max){ max = lin[i]; idx = i; }
       }
-      const nyquist = sampleRate / 2;
-      return Math.round((idx / freqData.length) * nyquist);
+      if (idx <= 0 || idx >= N-1){
+        // 端は補間できない
+        const nyquist = audioContext.sampleRate / 2;
+        return (idx / N) * nyquist;
+      }
+      // 二次補間：p = 0.5*(a - c)/(a - 2b + c)
+      const a = lin[idx-1], b = lin[idx], c = lin[idx+1];
+      const denom = (a - 2*b + c);
+      const p = Math.abs(denom) < 1e-12 ? 0 : 0.5 * (a - c) / denom;
+      const trueIndex = idx + p;
+      const nyquist = audioContext.sampleRate / 2;
+      return (trueIndex / N) * nyquist;
     }
 
-    function analyzeNoiseType(volumePct) {
+    // ====== 自相関で基本周波数（声/楽器向きの保険） ======
+    function autoCorrelate(timeBytes, sampleRate){
+      // timeBytes: 0..255 → -1..1 に正規化
+      const N = timeBytes.length;
+      const buf = new Float32Array(N);
+      for (let i=0;i<N;i++) buf[i] = (timeBytes[i]-128)/128;
+
+      // 窓関数（ハニング）で端影響を軽減
+      for (let i=0;i<N;i++) buf[i] *= 0.5*(1 - Math.cos(2*Math.PI*i/(N-1)));
+
+      // 自相関
+      const ac = new Float32Array(N);
+      for (let lag=0; lag<N; lag++){
+        let sum = 0;
+        for (let i=0; i<N-lag; i++){
+          sum += buf[i]*buf[i+lag];
+        }
+        ac[lag] = sum;
+      }
+
+      // 最大ピーク（lag>0）を探す
+      let peakLag = -1, peakVal = 0;
+      for (let lag=1; lag<N; lag++){
+        if (ac[lag] > peakVal){
+          peakVal = ac[lag]; peakLag = lag;
+        }
+      }
+      if (peakLag <= 0) return null;
+
+      const freq = sampleRate / peakLag;
+      if (freq < 50 || freq > 2000) return null; // 実用域に限定
+      return freq;
+    }
+
+    function analyzeNoiseType(volumePct){
       if (volumePct > 80) return '大きな騒音';
       if (volumePct > 60) return 'ざわめき';
       if (volumePct > 40) return '会話';
@@ -278,196 +247,156 @@
       return 'ほぼ無音';
     }
 
-    function getColorFromFrequency(freq) {
+    function getColorFromFrequency(freq){
       const hue = (Math.max(0, Math.min(20000, freq)) / 20000) * 360;
       return `hsl(${hue}, 70%, 50%)`;
     }
 
-    function fadeTrail(amount) {
-      // 0（残像なし）〜 0.2（強めフェード）
+    function fadeTrail(amount){
       const w = canvas.clientWidth, h = canvas.clientHeight;
-      ctx.fillStyle = `rgba(255, 255, 255, ${amount})`;
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = `rgba(255,255,255,${amount})`;
+      ctx.fillRect(0,0,w,h);
     }
 
     // ====== 描画モード ======
-    class Particle {
-      constructor(x, y, size, color, velocity) {
-        this.x = x; this.y = y;
-        this.size = size; this.color = color;
-        this.vx = velocity.x; this.vy = velocity.y;
-        this.life = 1.0; this.decay = 0.01;
-      }
+    class Particle{
+      constructor(x,y,size,color,velocity){ this.x=x; this.y=y; this.size=size; this.color=color; this.vx=velocity.x; this.vy=velocity.y; this.life=1; this.decay=0.01; }
       update(){ this.x+=this.vx; this.y+=this.vy; this.life-=this.decay; this.size*=0.995; }
-      draw(){
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, this.life);
-        ctx.fillStyle = this.color;
-        ctx.beginPath(); ctx.arc(this.x, this.y, Math.max(0, this.size), 0, Math.PI*2); ctx.fill();
-        ctx.restore();
-      }
+      draw(){ ctx.save(); ctx.globalAlpha=Math.max(0,this.life); ctx.fillStyle=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,Math.max(0,this.size),0,Math.PI*2); ctx.fill(); ctx.restore(); }
     }
 
-    function drawParticles(freqData, volumePct, peakFreq) {
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      const cx = w/2, cy = h/2;
-
-      if (volumePct > 12) {
-        const count = Math.min(8, Math.ceil((volumePct/100) * sensitivity));
-        for (let i=0;i<count;i++){
-          const angle = Math.random()*Math.PI*2;
-          const speed = (volumePct/100) * (0.5 + sensitivity*0.3);
-          const size = Math.max(1, (volumePct/100) * (2 + sensitivity));
-          const color = getColorFromFrequency(peakFreq);
-          particles.push(new Particle(
-            cx, cy, size, color,
-            { x: Math.cos(angle)*speed, y: Math.sin(angle)*speed }
-          ));
+    function drawParticles(freqData, volumePct, peakFreq){
+      const w=canvas.clientWidth, h=canvas.clientHeight, cx=w/2, cy=h/2;
+      if (volumePct>12){
+        const count=Math.min(8, Math.ceil((volumePct/100)*sensitivity));
+        for(let i=0;i<count;i++){
+          const ang=Math.random()*Math.PI*2;
+          const sp=(volumePct/100)*(0.5+sensitivity*0.3);
+          const size=Math.max(1,(volumePct/100)*(2+sensitivity));
+          particles.push(new Particle(cx,cy,size,getColorFromFrequency(peakFreq),{x:Math.cos(ang)*sp,y:Math.sin(ang)*sp}));
         }
       }
-      while (particles.length > MAX_PARTICLES) particles.shift();
+      while (particles.length>MAX_PARTICLES) particles.shift();
+      for (let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.update(); p.draw(); if (p.life<=0||p.size<=0.1) particles.splice(i,1); }
+    }
 
-      for (let i=particles.length-1;i>=0;i--){
-        const p = particles[i];
-        p.update(); p.draw();
-        if (p.life<=0 || p.size<=0.1) particles.splice(i,1);
+    function drawWaves(freqData, volumePct){
+      const w=canvas.clientWidth, h=canvas.clientHeight, barW=Math.max(1,w/freqData.length);
+      for(let i=0;i<freqData.length;i++){
+        const val=freqData[i]/255, barH=val*h*(0.5+sensitivity*0.1);
+        ctx.globalAlpha=0.7; ctx.fillStyle=getColorFromFrequency(i*120); ctx.fillRect(i*barW,h-barH,barW-1,barH);
       }
     }
 
-    function drawWaves(freqData, volumePct) {
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      const barW = Math.max(1, w / freqData.length);
-      for (let i=0;i<freqData.length;i++){
-        const val = freqData[i] / 255;
-        const barH = val * h * (0.5 + sensitivity*0.1);
-        ctx.globalAlpha = 0.7;
-        ctx.fillStyle = getColorFromFrequency(i*120);
-        ctx.fillRect(i*barW, h-barH, barW-1, barH);
+    function drawSpiral(freqData, volumePct, peakFreq){
+      const w=canvas.clientWidth, h=canvas.clientHeight, cx=w/2, cy=h/2;
+      const r=(volumePct/100)*(h*0.25)*(0.6+sensitivity*0.1);
+      const x=cx+Math.cos(spiralAngle)*r, y=cy+Math.sin(spiralAngle)*r;
+      const size=Math.max(1,(volumePct/100)*(1.5+sensitivity*0.3));
+      ctx.globalAlpha=0.8; ctx.fillStyle=getColorFromFrequency(peakFreq); ctx.beginPath(); ctx.arc(x,y,size,0,Math.PI*2); ctx.fill();
+      spiralAngle+=0.08+(sensitivity*0.002);
+    }
+
+    function drawTree(freqData, volumePct, peakFreq){
+      const w=canvas.clientWidth, h=canvas.clientHeight, cx=w/2, cy=h*0.65;
+      if (volumePct>28 && Math.random()<0.12){
+        const angle=(Math.random()-0.5)*Math.PI, length=(volumePct/100)*60*(0.6+sensitivity*0.1);
+        branches.push({x:cx,y:cy,angle,length,color:getColorFromFrequency(peakFreq),life:1});
+      }
+      for(let i=branches.length-1;i>=0;i--){
+        const b=branches[i]; ctx.strokeStyle=b.color; ctx.globalAlpha=b.life; ctx.lineWidth=Math.max(0.5,b.life*3);
+        ctx.beginPath(); ctx.moveTo(b.x,b.y);
+        const ex=b.x+Math.cos(b.angle)*b.length, ey=b.y+Math.sin(b.angle)*b.length; ctx.lineTo(ex,ey); ctx.stroke();
+        b.life-=0.012; if(b.life<=0) branches.splice(i,1);
       }
     }
 
-    function drawSpiral(freqData, volumePct, peakFreq) {
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      const cx = w/2, cy = h/2;
-
-      const radius = (volumePct/100) * (h*0.25) * (0.6 + sensitivity*0.1);
-      const x = cx + Math.cos(spiralAngle) * radius;
-      const y = cy + Math.sin(spiralAngle) * radius;
-
-      const color = getColorFromFrequency(peakFreq);
-      const size = Math.max(1, (volumePct/100) * (1.5 + sensitivity*0.3));
-
-      ctx.globalAlpha = 0.8;
-      ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x,y,size,0,Math.PI*2); ctx.fill();
-
-      spiralAngle += 0.08 + (sensitivity * 0.002);
-    }
-
-    function drawTree(freqData, volumePct, peakFreq) {
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      const cx = w/2, cy = h*0.65;
-
-      if (volumePct > 28 && Math.random() < 0.12) {
-        const angle = (Math.random()-0.5) * Math.PI;
-        const length = (volumePct/100) * 60 * (0.6 + sensitivity*0.1);
-        const color = getColorFromFrequency(peakFreq);
-        branches.push({ x:cx, y:cy, angle, length, color, life:1.0 });
-      }
-      for (let i=branches.length-1;i>=0;i--){
-        const b = branches[i];
-        ctx.strokeStyle = b.color;
-        ctx.globalAlpha = b.life;
-        ctx.lineWidth = Math.max(0.5, b.life*3);
-        ctx.beginPath();
-        ctx.moveTo(b.x,b.y);
-        const ex = b.x + Math.cos(b.angle)*b.length;
-        const ey = b.y + Math.sin(b.angle)*b.length;
-        ctx.lineTo(ex,ey);
-        ctx.stroke();
-        b.life -= 0.012;
-        if (b.life<=0) branches.splice(i,1);
-      }
-    }
-
-    // ====== 可視化ループ ======
-    function visualize(now) {
+    // ====== ループ ======
+    function visualize(now){
       if (!isRecording || !analyser || !audioContext) return;
-      const elapsed = now - lastFrame;
-      const target = 1000 / fpsCap;
-      if (elapsed < target) { animationId = requestAnimationFrame(visualize); return; }
-      lastFrame = now;
+      const elapsed=now-lastFrame, target=1000/fpsCap; if (elapsed<target){ animationId=requestAnimationFrame(visualize); return; } lastFrame=now;
 
-      const bufferLength = analyser.frequencyBinCount;
-      const freqArray = new Uint8Array(bufferLength);
-      const timeArray = new Uint8Array(bufferLength * 2); // time domain uses fftSize
+      const freqBins = analyser.frequencyBinCount;
+      const byteTime = new Uint8Array(analyser.fftSize);
+      const byteFreq = new Uint8Array(freqBins);
+      const floatFreq = new Float32Array(freqBins);
 
-      analyser.getByteFrequencyData(freqArray);
-      analyser.getByteTimeDomainData(timeArray);
+      analyser.getByteTimeDomainData(byteTime);
+      analyser.getByteFrequencyData(byteFreq);
+      analyser.getFloatFrequencyData(floatFreq); // dB
 
-      const rms = rmsFromTimeDomain(timeArray);
+      const rms = rmsFromTimeDomain(byteTime);
       const volumePct = Math.round(Math.min(100, rms * 140));
       volumeDisplay.textContent = volumePct;
 
-      const peakFreq = getPeakFrequency(freqArray, audioContext.sampleRate);
-      frequencyDisplay.textContent = `${peakFreq} Hz`;
+      // まずスペクトル（二次補間）で推定
+      let peakFreq = peakFreqFromSpectrum(analyser, floatFreq);
 
+      // スペクトルがフラットで信頼度が低い場合は自相関で保険（声・単音に有効）
+      // ざっくり：最大dBが低い＆RMSがそこそこ のときに自相関を優先
+      const maxDb = Math.max(...floatFreq);
+      if (maxDb < -80 && rms > 0.03){
+        const acFreq = autoCorrelate(byteTime, audioContext.sampleRate);
+        if (acFreq) peakFreq = acFreq;
+      }
+
+      frequencyDisplay.textContent = `${Math.round(peakFreq)} Hz`;
       noiseTypeDisplay.textContent = analyzeNoiseType(volumePct);
 
       fadeTrail(trail);
-
-      switch (currentMode) {
-        case 'particles': drawParticles(freqArray, volumePct, peakFreq); break;
-        case 'waves': drawWaves(freqArray, volumePct); break;
-        case 'spiral': drawSpiral(freqArray, volumePct, peakFreq); break;
-        case 'tree': drawTree(freqArray, volumePct, peakFreq); break;
+      switch (currentMode){
+        case 'particles': drawParticles(byteFreq, volumePct, peakFreq); break;
+        case 'waves':     drawWaves(byteFreq, volumePct); break;
+        case 'spiral':    drawSpiral(byteFreq, volumePct, peakFreq); break;
+        case 'tree':      drawTree(byteFreq, volumePct, peakFreq); break;
       }
-
       animationId = requestAnimationFrame(visualize);
     }
 
-    // ====== オーディオセットアップ ======
-    async function listDevices() {
-      try {
+    // ====== オーディオ I/O ======
+    async function listDevices(){
+      try{
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const inputs = devices.filter(d => d.kind === 'audioinput');
+        const inputs = devices.filter(d=>d.kind==='audioinput');
         deviceSelect.innerHTML = '';
-        inputs.forEach((d, i) => {
+        inputs.forEach((d,i)=>{
           const opt = document.createElement('option');
-          opt.value = d.deviceId;
-          opt.textContent = d.label || `マイク ${i+1}`;
+          opt.value = d.deviceId; opt.textContent = d.label || `マイク ${i+1}`;
           deviceSelect.appendChild(opt);
         });
-      } catch (e) {
-        console.warn('デバイス一覧の取得に失敗:', e);
-      }
+      }catch(e){ console.warn('デバイス一覧の取得に失敗:', e); }
     }
 
-    function getConstraints() {
+    function getConstraints(){
       const deviceId = deviceSelect.value;
-      const raw = rawAudioCheckbox.checked || SETTINGS.rawAudio;
+      const raw = rawAudioCheckbox.checked ?? SETTINGS.rawAudio;
       return {
         audio: {
           deviceId: deviceId ? { exact: deviceId } : undefined,
-          echoCancellation: raw ? false : true,
-          noiseSuppression: raw ? false : true,
-          autoGainControl: raw ? false : true,
+          echoCancellation: !raw ? true : false,
+          noiseSuppression: !raw ? true : false,
+          autoGainControl: !raw ? true : false,
           channelCount: 1,
           sampleRate: 44100
         }
       };
     }
 
-    async function startRecording() {
-      try {
+    async function startRecording(){
+      try{
         await stopRecording(true);
-        // 一度許可ダイアログを出してデバイス名を得る（Safari対策）
+        // 権限要求（Safariでラベル取得のため一度呼ぶ）
         await navigator.mediaDevices.getUserMedia({ audio: true });
 
         mediaStream = await navigator.mediaDevices.getUserMedia(getConstraints());
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = Number(fftSizeSelect.value) || (SETTINGS.fftSize ?? 512);
-        analyser.smoothingTimeConstant = Number(smoothingSlider.value) || (SETTINGS.smoothingTimeConstant ?? 0.75);
+        analyser.fftSize = Number(fftSizeSelect.value) || SETTINGS.fftSize;
+        analyser.smoothingTimeConstant = Number(smoothingSlider.value) || SETTINGS.smoothingTimeConstant;
+
+        // ここが重要：ダイナミックレンジを広げてピークを潰さない
+        analyser.minDecibels = -100;
+        analyser.maxDecibels = -10;
 
         microphone = audioContext.createMediaStreamSource(mediaStream);
         microphone.connect(analyser);
@@ -478,7 +407,7 @@
 
         await listDevices();
         animationId = requestAnimationFrame(visualize);
-      } catch (err) {
+      }catch(err){
         console.error('マイクへのアクセスが拒否/失敗:', err);
         permissionMessage.textContent = 'マイクへのアクセスが拒否されました。ブラウザの設定を確認してください。';
         permissionMessage.style.display = 'block';
@@ -486,88 +415,52 @@
       }
     }
 
-    async function stopRecording(keepDevices=false) {
+    async function stopRecording(keepDevices=false){
       isRecording = false;
-      if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
-      if (microphone) { try { microphone.disconnect(); } catch {} microphone = null; }
-      if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
-      if (audioContext) { try { await audioContext.close(); } catch {} audioContext = null; }
+      if (animationId){ cancelAnimationFrame(animationId); animationId = null; }
+      if (microphone){ try{ microphone.disconnect(); }catch{} microphone=null; }
+      if (mediaStream){ mediaStream.getTracks().forEach(t=>t.stop()); mediaStream=null; }
+      if (audioContext){ try{ await audioContext.close(); }catch{} audioContext=null; }
       analyser = null;
       startBtn.textContent = '🎤 録音開始';
     }
 
     // ====== イベント ======
-    startBtn.addEventListener('click', () => { isRecording ? stopRecording() : startRecording(); });
-
-    clearBtn.addEventListener('click', () => {
-      particles.length = 0; branches.length = 0; spiralAngle = 0;
-      ctx.fillStyle = SETTINGS.canvas?.background || '#ffffff';
-      ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    startBtn.addEventListener('click', ()=>{ isRecording ? stopRecording() : startRecording(); });
+    clearBtn.addEventListener('click', ()=>{
+      particles.length=0; branches.length=0; spiralAngle=0;
+      ctx.fillStyle = SETTINGS.canvas.background; ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
+    });
+    saveBtn.addEventListener('click', ()=>{
+      const w=canvas.clientWidth, h=canvas.clientHeight, scale=SETTINGS.canvas.exportScale;
+      const off=document.createElement('canvas'); off.width=w*scale; off.height=h*scale;
+      const octx=off.getContext('2d'); octx.fillStyle=SETTINGS.canvas.background; octx.fillRect(0,0,off.width,off.height);
+      octx.drawImage(canvas,0,0,off.width,off.height);
+      const link=document.createElement('a'); link.download=`noise-art-${Date.now()}.png`; link.href=off.toDataURL('image/png'); link.click();
     });
 
-    saveBtn.addEventListener('click', () => {
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      const off = document.createElement('canvas');
-      const scale = SETTINGS.canvas?.exportScale ?? 2;
-      off.width = w * scale; off.height = h * scale;
-      const octx = off.getContext('2d');
-      octx.fillStyle = SETTINGS.canvas?.background || '#ffffff';
-      octx.fillRect(0, 0, off.width, off.height);
-      octx.drawImage(canvas, 0, 0, off.width, off.height);
-      const link = document.createElement('a');
-      link.download = `noise-art-${Date.now()}.png`;
-      link.href = off.toDataURL('image/png');
-      link.click();
-    });
-
-    modeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        modeButtons.forEach(b => {
-          const active = (b === btn);
-          b.classList.toggle('active', active);
-          b.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
+    modeButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        modeButtons.forEach(b=>{ const active=(b===btn); b.classList.toggle('active',active); b.setAttribute('aria-selected', active?'true':'false'); });
         currentMode = btn.dataset.mode;
-        if (document.getElementById('autoClear').checked || SETTINGS.autoClearOnModeChange) {
-          clearBtn.click();
-        }
+        if (autoClearCheckbox.checked || SETTINGS.autoClearOnModeChange) clearBtn.click();
       });
     });
 
-    sensitivitySlider.addEventListener('input', e => {
-      sensitivity = parseInt(e.target.value, 10);
-      sensitivityValue.textContent = String(sensitivity);
-    });
-    trailSlider.addEventListener('input', e => {
-      trail = Number(e.target.value);
-      trailValue.textContent = trail.toFixed(3);
-    });
-    fftSizeSelect.addEventListener('change', () => { if (analyser) analyser.fftSize = Number(fftSizeSelect.value); });
-    smoothingSlider.addEventListener('input', e => { if (analyser) analyser.smoothingTimeConstant = Number(e.target.value); });
+    sensitivitySlider.addEventListener('input', e=>{ sensitivity = parseInt(e.target.value,10); sensitivityValue.textContent = String(sensitivity); });
+    trailSlider.addEventListener('input', e=>{ trail = Number(e.target.value); trailValue.textContent = trail.toFixed(3); });
+    fftSizeSelect.addEventListener('change', ()=>{ if (analyser) analyser.fftSize = Number(fftSizeSelect.value); });
+    smoothingSlider.addEventListener('input', e=>{ if (analyser) analyser.smoothingTimeConstant = Number(e.target.value); });
 
-    navigator.mediaDevices?.addEventListener?.('devicechange', async () => { await listDevices(); });
+    navigator.mediaDevices?.addEventListener?.('devicechange', listDevices);
+    document.addEventListener('visibilitychange', ()=>{ if (document.hidden && isRecording) stopRecording(true); });
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && isRecording) stopRecording(true);
-      // 自動再開はしない（誤動作防止）
-    });
-
-    // 初期UI同期
-    (function initUI(){
-      // 初期モードのaria/active
-      modeButtons.forEach(b => {
-        const active = (b.dataset.mode === currentMode);
-        b.classList.toggle('active', active);
-        b.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
-      sensitivitySlider.value = sensitivity;
-      sensitivityValue.textContent = String(sensitivity);
-      trailSlider.value = trail;
-      trailValue.textContent = trail.toFixed(3);
-
-      ctx.fillStyle = SETTINGS.canvas?.background || '#ffffff';
-      ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-
+    // 初期UI
+    (function init(){
+      modeButtons.forEach(b=>{ const active=(b.dataset.mode===currentMode); b.classList.toggle('active', active); b.setAttribute('aria-selected', active?'true':'false'); });
+      sensitivitySlider.value = sensitivity; sensitivityValue.textContent = String(sensitivity);
+      trailSlider.value = trail; trailValue.textContent = trail.toFixed(3);
+      ctx.fillStyle = SETTINGS.canvas.background; ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
       listDevices();
     })();
   </script>
